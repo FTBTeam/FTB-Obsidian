@@ -1,6 +1,6 @@
 package dev.ftb.mods.obsidian.pack;
 
-import dev.ftb.mods.obsidian.Obsidian;
+import dev.ftb.mods.obsidian.client.ClientConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
@@ -8,6 +8,7 @@ import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
+import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -23,6 +24,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class PathBasedPackSource implements RepositorySource {
+    private static final Path dataPacksPath = FMLPaths.GAMEDIR.get().resolve("datapacks");
+    private static final Path resourcePacksPath = FMLPaths.GAMEDIR.get().resolve("resourcepacks");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PathBasedPackSource.class);
     private static final Component OBSIDIAN_LOADED_DECORATOR = Component.literal("Obsidian").withStyle(ChatFormatting.DARK_PURPLE);
 
@@ -31,21 +35,18 @@ public class PathBasedPackSource implements RepositorySource {
 
     public PathBasedPackSource(PackType packType) {
         this.packType = packType;
-        this.path = Obsidian.FTB_DIRECTORY.resolve(packType == PackType.SERVER_DATA ? "data" : "assets");
+        this.path = packType == PackType.SERVER_DATA ? dataPacksPath : resourcePacksPath;// Obsidian.FTB_DIRECTORY.resolve(packType == PackType.SERVER_DATA ? "data" : "assets");
     }
 
     public static void init() {
-        try {
-            var rootPath = getAndCreateIfNotExists(Obsidian.FTB_DIRECTORY);
-            getAndCreateIfNotExists(rootPath.resolve("data"));
-            getAndCreateIfNotExists(rootPath.resolve("assets"));
-        } catch (IOException e) {
-            LOGGER.error("Couldn't initialize VirtualPackSource", e);
-        }
     }
 
     @Override
     public void loadPacks(@NotNull Consumer<Pack> consumer) {
+        LOGGER.info("Loading packs...");
+        // Don't do anything if the path doesn't exist
+        if (!Files.exists(path)) return;
+
         var packs = createPacksFromPath();
         if (packs.isEmpty()) {
             return;
@@ -69,7 +70,19 @@ public class PathBasedPackSource implements RepositorySource {
         List<Pack> packs = new ArrayList<>();
         List<Path> possiblePacks = visitor.getPackPaths();
         for (Path possiblePack : possiblePacks) {
-            var name = possiblePack.getFileName().toString().replace(".zip", "").toLowerCase();
+            String rawFileName = possiblePack.getFileName().toString();
+            var name = rawFileName.replace(".zip", "").toLowerCase();
+
+            if (packType == PackType.CLIENT_RESOURCES) {
+                List<String> forcedResourcePacks = ClientConfig.FORCE_LOADED_RESOURCE_PACKS.get();
+                LOGGER.info("Loading forced resource packs...");
+                LOGGER.info("Searching for resource pack: {}", rawFileName);
+                LOGGER.info("Found {} resource packs", forcedResourcePacks);
+                if (!forcedResourcePacks.contains(rawFileName)) {
+                    // Skip this resource pack, it's not in the force loaded list
+                    continue;
+                }
+            }
 
             PackLocationInfo locationInfo = new PackLocationInfo(
                     name,
@@ -96,14 +109,6 @@ public class PathBasedPackSource implements RepositorySource {
         }
 
         return packs;
-    }
-
-    private static Path getAndCreateIfNotExists(Path path) throws IOException {
-        if (Files.notExists(path)) {
-            Files.createDirectories(path);
-        }
-
-        return path;
     }
 
     private static class PackVisitor implements FileVisitor<Path> {

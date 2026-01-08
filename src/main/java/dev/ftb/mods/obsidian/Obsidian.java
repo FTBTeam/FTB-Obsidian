@@ -1,8 +1,12 @@
 package dev.ftb.mods.obsidian;
 
+import dev.ftb.mods.ftblibrary.config.manager.ConfigManager;
+import dev.ftb.mods.obsidian.client.ObsidianClient;
+import dev.ftb.mods.obsidian.config.CommonConfig;
+import dev.ftb.mods.obsidian.config.ServerConfig;
 import dev.ftb.mods.obsidian.pack.PathBasedPackSource;
-import net.minecraft.resources.ResourceLocation;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -21,13 +25,16 @@ import java.nio.file.Path;
 @Mod(Obsidian.MOD_ID)
 public class Obsidian {
     public static final String MOD_ID = "ftbobsidian";
-    public static Path FTB_DIRECTORY;
+
+    public static Path FTB_DIRECTORY = FMLPaths.GAMEDIR.get().resolve("obsidian");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Obsidian.class);
 
     public Obsidian(IEventBus eventBus, ModContainer container) {
-        FTB_DIRECTORY = FMLPaths.GAMEDIR.get().resolve("obsidian");
-        PathBasedPackSource.init();
+        ObsidianClient.init();
+
+        ConfigManager.getInstance().registerServerConfig(ServerConfig.CONFIG, MOD_ID + ".client", false); // Server.
+        ConfigManager.getInstance().registerServerConfig(CommonConfig.CONFIG, MOD_ID + ".client", true); // Common
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             eventBus.<FMLClientSetupEvent>addListener(event -> clientSetup(event, eventBus));
@@ -42,10 +49,10 @@ public class Obsidian {
     }
 
     private void clientSetup(FMLClientSetupEvent event, IEventBus eventBus) {
-        // Client init
+        ObsidianClient.setup();
     }
 
     public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(Obsidian.MOD_ID, path);
     }
 }
