@@ -1,7 +1,7 @@
-package dev.ftb.mods.obsidian.config;
+package dev.ftb.mods.ftbobsidian.config;
 
 import dev.ftb.mods.ftblibrary.snbt.config.SNBTConfig;
-import dev.ftb.mods.obsidian.Obsidian;
+import dev.ftb.mods.ftbobsidian.Obsidian;
 
 public interface CommonConfig {
     SNBTConfig CONFIG = SNBTConfig.create(Obsidian.MOD_ID + "-common");

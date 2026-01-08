@@ -19,3 +19,6 @@ mandatory = true
 versionRange = "${mod_loader_range}"
 ordering = "NONE"
 side="BOTH"
+
+[[mixins]]
+config = "ftbobsidian.mixins.json"

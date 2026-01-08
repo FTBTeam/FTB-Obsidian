@@ -1,7 +1,7 @@
-package dev.ftb.mods.obsidian.client;
+package dev.ftb.mods.ftbobsidian.client;
 
 import dev.ftb.mods.ftblibrary.config.manager.ConfigManager;
-import dev.ftb.mods.obsidian.Obsidian;
+import dev.ftb.mods.ftbobsidian.Obsidian;
 
 public class ObsidianClient {
     public static void init() {
