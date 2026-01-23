@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "dev.ftb.mods.ftbobsidian.mixin",
+  "refmap": "ftbobsidian.mixins.refmap.json",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [

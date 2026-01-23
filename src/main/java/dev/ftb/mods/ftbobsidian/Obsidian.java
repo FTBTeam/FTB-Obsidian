@@ -1,9 +1,7 @@
 package dev.ftb.mods.ftbobsidian;
 
-import dev.ftb.mods.ftblibrary.config.manager.ConfigManager;
+import dev.ftb.mods.ftblibrary.snbt.config.ConfigUtil;
 import dev.ftb.mods.ftbobsidian.client.ObsidianClient;
-import dev.ftb.mods.ftbobsidian.config.CommonConfig;
-import dev.ftb.mods.ftbobsidian.config.ServerConfig;
 import dev.ftb.mods.ftbobsidian.config.StartupConfig;
 
 import net.minecraft.ChatFormatting;
@@ -12,16 +10,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.FolderRepositorySource;
 import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.world.level.validation.DirectoryValidator;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.AddPackFindersEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.loading.FMLPaths;
 
-import net.neoforged.fml.loading.FMLPaths;
-import net.neoforged.neoforge.event.AddPackFindersEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,13 +35,14 @@ public class Obsidian {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Obsidian.class);
 
-    public Obsidian(IEventBus eventBus, ModContainer container) {
+    public Obsidian() {
         ObsidianClient.init();
 
-        ConfigManager.getInstance().registerStartupConfig(StartupConfig.CONFIG, MOD_ID + ".startup");
-        ConfigManager.getInstance().registerServerConfig(ServerConfig.CONFIG, MOD_ID + ".client", false); // Server.
-        ConfigManager.getInstance().registerServerConfig(CommonConfig.CONFIG, MOD_ID + ".client", true); // Common
+        ConfigUtil.loadDefaulted(StartupConfig.CONFIG, ConfigUtil.CONFIG_DIR, MOD_ID);
+//        ConfigManager.getInstance().registerServerConfig(ServerConfig.CONFIG, MOD_ID + ".client", false); // Server.
+//        ConfigManager.getInstance().registerServerConfig(CommonConfig.CONFIG, MOD_ID + ".client", true); // Common
 
+        var eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         if (FMLEnvironment.dist == Dist.CLIENT) {
             eventBus.<FMLClientSetupEvent>addListener(event -> clientSetup(event, eventBus));
         }
@@ -55,7 +54,7 @@ public class Obsidian {
         PackType packType = event.getPackType();
         if (packType == PackType.SERVER_DATA) {
             var packSource = PackSource.create(type -> Component.translatable("pack.nameAndSource", type, OBSIDIAN_LOADED_DECORATOR), true);
-            event.addRepositorySource(new FolderRepositorySource(DATA_PACKS_PATH, PackType.SERVER_DATA, packSource, new DirectoryValidator((path) -> true)));
+            event.addRepositorySource(new FolderRepositorySource(DATA_PACKS_PATH, PackType.SERVER_DATA, packSource));
         }
     }
 

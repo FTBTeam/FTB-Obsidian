@@ -2,7 +2,7 @@ plugins {
 	id 'java-library'
 	id 'idea'
 	id 'maven-publish'
-	id 'net.neoforged.moddev' version '2.0.78'
+	id 'net.neoforged.moddev.legacyforge' version '2.0.140'
 	id "me.modmuss50.mod-publish-plugin" version "0.8.3"
 }
 
@@ -22,10 +22,10 @@ base {
 apply from: 'https://raw.githubusercontent.com/FTBTeam/mods-meta/main/gradle/changelog.gradle'
 apply from: "https://raw.githubusercontent.com/FTBTeam/mods-meta/main/gradle/publishing.gradle"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-neoForge {
-	version = "${mcMinorAndPatch}.${neo_version}"
+legacyForge {
+	version = "${minecraft_version}-${neo_version}"
 
 	parchment {
 		mappingsVersion = project.parchment_mappings_version
@@ -93,10 +93,25 @@ repositories {
 			includeGroup("dev.architectury")
 		}
 	}
+
+	maven {
+		url = "https://modmaven.dev"
+		content {
+			includeGroup("mezz.jei")
+		}
+	}
 }
 
 dependencies {
-	implementation "dev.ftb.mods:ftb-library-neoforge:${ftb_library_version}"
+	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+	modImplementation "dev.ftb.mods:ftb-library-forge:${ftb_library_version}"
+	modRuntimeOnly "dev.architectury:architectury-forge:9.2.14"
+}
+
+mixin {
+	add sourceSets.main, 'ftbobsidian.mixins.refmap.json'
+	config 'ftbobsidian.mixins.json'
 }
 
 tasks.register("sourcesJar", Jar) {
@@ -113,10 +128,11 @@ tasks.register("sourcesJar", Jar) {
 // 	include 'dev/ftb/mods/{package_name}/api/**'
 // }
 
-tasks.named("jar") {
-	dependsOn("sourcesJar")
-	// Uncomment this if you want to create an API jar
-	// dependsOn("apiJar")
+jar {
+	finalizedBy('reobfJar')
+	manifest.attributes([
+			"MixinConfigs": "ftbobsidian.mixins.json"
+	])
 }
 
 tasks.withType(ProcessResources).configureEach {
@@ -132,7 +148,7 @@ tasks.withType(ProcessResources).configureEach {
 
 	inputs.properties replaceProperties
 
-	filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+	filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
 		expand replaceProperties
 	}
 
