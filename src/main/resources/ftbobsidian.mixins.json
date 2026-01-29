@@ -7,7 +7,8 @@
   "client": [
   ],
   "mixins": [
-    "FolderRepositorySourceMixin"
+    "FolderRepositorySourceMixin",
+    "PackMixin"
   ],
   "injectors": {
     "defaultRequire": 1
