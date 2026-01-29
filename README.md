@@ -2,6 +2,14 @@
 
 Use https://github.com/FTBTeam/FTB-Mods-Issues for any mod issues
 
+Obsidian is currently a utility mod aimed at providing some essential features required for the creation of modpacks. Right now, we support `resourcepack` and `datapacks` loading from the root game folders.
+
+## Features
+
+- Ability to force load `resourcepacks` via the `resourcepacks` folder alongside the config held in `ftbobsidian-startup.snbt`. This allows you to define the packs to be force load via their id. This is typically `file/the_file_name.zip` or `folder/the_folder_name`.
+- Ability to override a `resourcepacks` compatability via the `ftbobsidian-startup.snbt` config. This allows you to force Minecraft to think a `resourcepack` is compatible when the `resourcepack` itself does not define it as such.
+- Ability to load datapacks by default via the `datapacks` folder. This does not require a config, any datapacks inside this path are automatically loaded into the game.
+
 ## Support
 
 - For **Modpack** issues, please go here: https://go.ftb.team/support-modpack
@@ -14,4 +22,4 @@ All Rights Reserved to Feed The Beast Ltd. Source code is `visible source`, plea
 
 ## Keep up to date
 
-[![](https://cdn.feed-the-beast.com/assets/socials/icons/social-discord.webp)](https://go.ftb.team/discord) [![](https://cdn.feed-the-beast.com/assets/socials/icons/social-github.webp)](https://go.ftb.team/github) [![](https://cdn.feed-the-beast.com/assets/socials/icons/social-twitter-x.webp)](https://go.ftb.team/twitter) [![](https://cdn.feed-the-beast.com/assets/socials/icons/social-youtube.webp)](https://go.ftb.team/youtube) [![](https://cdn.feed-the-beast.com/assets/socials/icons/social-twitch.webp)](https://go.ftb.team/twitch) [![](https://cdn.feed-the-beast.com/assets/socials/icons/social-instagram.webp)](https://go.ftb.team/instagram) [![](https://cdn.feed-the-beast.com/assets/socials/icons/social-facebook.webp)](https://go.ftb.team/facebook) [![](https://cdn.feed-the-beast.com/assets/socials/icons/social-tiktok.webp)](https://go.ftb.team/tiktok)
+[![FTB Socials](https://cdn.feed-the-beast.com/assets/socials/icons/socials-scaled-cf.webp?ref=curseforge)](https://feed-the-beast.com/links)
