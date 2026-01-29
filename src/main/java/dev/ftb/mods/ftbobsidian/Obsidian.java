@@ -1,6 +1,7 @@
 package dev.ftb.mods.ftbobsidian;
 
 import dev.ftb.mods.ftblibrary.config.manager.ConfigManager;
+import dev.ftb.mods.ftbobsidian.client.ClientConfig;
 import dev.ftb.mods.ftbobsidian.client.ObsidianClient;
 import dev.ftb.mods.ftbobsidian.config.CommonConfig;
 import dev.ftb.mods.ftbobsidian.config.ServerConfig;
@@ -40,9 +41,10 @@ public class Obsidian {
     public Obsidian(IEventBus eventBus, ModContainer container) {
         ObsidianClient.init();
 
-        ConfigManager.getInstance().registerStartupConfig(StartupConfig.CONFIG, MOD_ID + ".startup");
-        ConfigManager.getInstance().registerServerConfig(ServerConfig.CONFIG, MOD_ID + ".client", false); // Server.
-        ConfigManager.getInstance().registerServerConfig(CommonConfig.CONFIG, MOD_ID + ".client", true); // Common
+        ConfigManager.getInstance().registerClientConfig(ClientConfig.CONFIG, MOD_ID);
+        ConfigManager.getInstance().registerStartupConfig(StartupConfig.CONFIG, MOD_ID);
+        ConfigManager.getInstance().registerServerConfig(ServerConfig.CONFIG, MOD_ID, false); // Server.
+        ConfigManager.getInstance().registerServerConfig(CommonConfig.CONFIG, MOD_ID, true); // Common
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             eventBus.<FMLClientSetupEvent>addListener(event -> clientSetup(event, eventBus));

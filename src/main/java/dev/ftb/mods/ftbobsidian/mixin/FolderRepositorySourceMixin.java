@@ -1,7 +1,8 @@
 package dev.ftb.mods.ftbobsidian.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
+import dev.ftb.mods.ftbobsidian.client.ClientConfig;
 import dev.ftb.mods.ftbobsidian.config.StartupConfig;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackSelectionConfig;
 import net.minecraft.server.packs.PackType;
@@ -31,7 +32,7 @@ public class FolderRepositorySourceMixin {
             index = 3
     )
     private PackSelectionConfig modifyPackSelectionConfig(PackSelectionConfig selectionConfig, @Local PackLocationInfo packLocationInfo) {
-        if (this.packType != PackType.SERVER_DATA) {
+        if (this.packType == PackType.SERVER_DATA) {
             return selectionConfig;
         }
 
