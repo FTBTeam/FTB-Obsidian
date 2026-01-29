@@ -179,7 +179,7 @@ publishMods {
 	def CFToken = providers.environmentVariable("CURSEFORGE_KEY");
 
 	dryRun = !CFToken.isPresent()
-	displayName = "${mod_name} ${version}"
+	displayName = "${mod_name} ${project.version}"
 	modLoaders.add("neoforge")
 
 	changelog = createChangelog(project)
