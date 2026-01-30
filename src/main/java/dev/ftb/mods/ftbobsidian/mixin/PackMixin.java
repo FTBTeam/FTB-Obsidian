@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Pack.class)
 public class PackMixin {
     @Mutable
-    @Shadow
+    @Shadow(aliases = {"f_10405_"})
     @Final
     private PackCompatibility compatibility;
 
