@@ -10,7 +10,9 @@ tasks.named('wrapper', Wrapper).configure {
 	distributionType = Wrapper.DistributionType.BIN
 }
 
-version = "${minecraft_version}.${mod_minor}.${mod_revision}"
+def mcMinorAndPatch = getMinorAndPatchFromMc()
+
+version = "${mcMinorAndPatch}.${mod_version}"
 group = project.maven_group
 
 base {
@@ -67,6 +69,12 @@ configurations {
 }
 
 repositories {
+	maven {
+		url = "https://maven.ftb.dev/releases"
+		content {
+			includeGroup("dev.ftb.mods")
+		}
+	}
 	maven {
 		url = "https://maven.ftb.dev/snapshots"
 		content {
@@ -125,6 +133,12 @@ idea {
 		downloadSources = true
 		downloadJavadoc = true
 	}
+}
+
+def getMinorAndPatchFromMc() {
+	String mcVersion = project.minecraft_version
+	String[] split = mcVersion.split("\\.")
+	return split[0] + "." + split[1] + "." + (split.length > 2 ? split[2] : "0")
 }
 
 publishMods {
