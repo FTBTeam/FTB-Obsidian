@@ -10,7 +10,7 @@ tasks.named('wrapper', Wrapper).configure {
 	distributionType = Wrapper.DistributionType.BIN
 }
 
-version = "${minecraft_version}.${mod_version}"
+version = "${minecraft_version}.${mod_minor}.${mod_revision}"
 group = project.maven_group
 
 base {
