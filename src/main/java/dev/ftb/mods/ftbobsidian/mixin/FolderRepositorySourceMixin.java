@@ -1,6 +1,5 @@
 package dev.ftb.mods.ftbobsidian.mixin;
 
-import dev.ftb.mods.ftbobsidian.client.ClientConfig;
 import dev.ftb.mods.ftbobsidian.config.StartupConfig;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.packs.PackLocationInfo;
@@ -46,7 +45,6 @@ public class FolderRepositorySourceMixin {
             return FORCE_LOADED_CONFIG;
         }
 
-        // Otherwise fall back to the default
         return selectionConfig;
     }
 }
