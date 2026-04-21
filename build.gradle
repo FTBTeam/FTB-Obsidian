@@ -2,7 +2,7 @@ plugins {
 	id 'java-library'
 	id 'idea'
 	id 'maven-publish'
-	id 'net.neoforged.moddev' version '2.0.140'
+	id 'net.neoforged.moddev' version '2.0.141'
 	id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 }
 
@@ -10,22 +10,22 @@ tasks.named('wrapper', Wrapper).configure {
 	distributionType = Wrapper.DistributionType.BIN
 }
 
-def mcMinorAndPatch = getMinorAndPatchFromMc()
+apply from: 'https://raw.githubusercontent.com/FTBTeam/mods-meta/v1/gradle/maven.gradle'
+apply from: 'https://raw.githubusercontent.com/FTBTeam/mods-meta/v1/gradle/publishing-2.gradle'
+apply from: 'https://raw.githubusercontent.com/FTBTeam/mods-meta/v1/gradle/utils.gradle'
+apply from: 'https://raw.githubusercontent.com/FTBTeam/mods-meta/v1/gradle/changelog.gradle'
 
-version = "${mcMinorAndPatch}.${mod_version}"
+version = createModVersion(project)
 group = project.maven_group
 
 base {
 	archivesName = project.archives_base_name
 }
 
-apply from: 'https://raw.githubusercontent.com/FTBTeam/mods-meta/main/gradle/changelog.gradle'
-apply from: "https://raw.githubusercontent.com/FTBTeam/mods-meta/main/gradle/publishing.gradle"
-
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 neoForge {
-	version = "${neo_version}"
+	version = neoforge_version
 
 	runs {
 		configureEach {
@@ -50,7 +50,7 @@ neoForge {
 		}
 
 		data {
-			data()
+			clientData()
 			programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
 		}
 	}
@@ -69,25 +69,8 @@ configurations {
 }
 
 repositories {
-	maven {
-		url = "https://maven.ftb.dev/releases"
-		content {
-			includeGroup("dev.ftb.mods")
-		}
-	}
-	maven {
-		url = "https://maven.ftb.dev/snapshots"
-		content {
-			includeGroup("dev.ftb.mods")
-		}
-	}
-
-	maven {
-		url = "https://maven.architectury.dev"
-		content {
-			includeGroup("dev.architectury")
-		}
-	}
+	mavenCentral()
+	commonMavenRepos(repositories)
 }
 
 dependencies {
@@ -107,10 +90,10 @@ tasks.withType(ProcessResources).configureEach {
 	var replaceProperties = [
 		version: version,
 		mod_id: mod_id,
-		mod_name: mod_name,
-		pack_format: pack_format,
-		loader_version_range: loader_version_range,
-		mod_loader_range: mod_loader_range,
+		minecraft_version_range: minecraft_version_range,
+		neoforge_version_range: neoforge_version_range,
+		neoforge_loader_version: neoforge_loader_version,
+		ftb_library_version_range: ftb_library_version_range
 	]
 
 	inputs.properties replaceProperties
@@ -135,53 +118,29 @@ idea {
 	}
 }
 
-def getMinorAndPatchFromMc() {
-	String mcVersion = project.minecraft_version
-	String[] split = mcVersion.split("\\.")
-	return split[0] + "." + split[1] + "." + (split.length > 2 ? split[2] : "0")
-}
-
 publishMods {
 	def CFToken = providers.environmentVariable("CURSEFORGE_KEY");
 
-	dryRun = !CFToken.isPresent()
-	displayName = "${mod_name} ${project.version}"
+	dryRun = !CFToken.isPresent() || providers.environmentVariable("SKIP_CURSEFORGE").getOrNull() != null
+	changelog = createChangelog(project)
+	version = project.version
+	type = createReleaseType(project)
+
+	displayName = "FTB Obsidian ${project.version}"
 	modLoaders.add("neoforge")
 
-	changelog = createChangelog(project)
 	file = jar.archiveFile
-	version = project.version
-
-	def tag = providers.environmentVariable("TAG").getOrElse("release")
-	type = tag.endsWith("-beta") ? BETA : (tag.endsWith("-alpha") ? ALPHA : STABLE)
 
 	curseforge {
 		accessToken = CFToken.orElse("missing")
 		projectId = project.curseforge_id
-		minecraftVersions.add(project.minecraft_version)
+		supported_minecraft_versions.split(",").each {
+			minecraftVersions.add(it.trim())
+		}
 		javaVersions.add(JavaVersion.VERSION_25)
 
 		requires("ftb-library-forge")
 	}
 }
 
-publishing {
-	publications {
-		register('mavenJava', MavenPublication) {
-			from components.java
-			artifact sourcesJar
-		}
-	}
-
-	repositories {
-		if (ftbPublishing.ftbToken) {
-			maven {
-				url ftbPublishing.ftbURL
-				credentials {
-					username = ftbPublishing.ftbUser
-					password = ftbPublishing.ftbToken
-				}
-			}
-		}
-	}
-}
+createMavenPublishingBlock(project)

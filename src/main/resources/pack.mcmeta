@@ -1,7 +1,0 @@
-{
-  "pack": {
-    "description": "Mod Resources",
-    "min_format": [${pack_format}, 0],
-    "max_format": [${pack_format}, 2147483647]
-  }
-}
