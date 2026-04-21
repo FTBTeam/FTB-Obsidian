@@ -1,24 +1,30 @@
 modLoader = "javafml"
-loaderVersion = "${loader_version_range}"
+loaderVersion = "${neoforge_loader_version}"
 license = "All Rights Reserved"
 
 [[mods]]
 modId = "${mod_id}"
 version = "${version}"
-displayName = "${mod_name}"
-displayURL = "https://www.curseforge.com/minecraft/mc-mods/ftb-mod-name"
-#logoFile = "logo.png"
+displayName = "FTB Obsidian"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/ftb-obsidian"
 authors = "FTB Team"
 description = '''
-Description
+FTB Obsidian brings global datapacks + force loaded resources packs to NeoForge.
 '''
 
 [[dependencies.${mod_id}]]
 modId = "neoforge"
-mandatory = true
-versionRange = "${mod_loader_range}"
+type = "required"
+versionRange = "${neoforge_version_range}"
 ordering = "NONE"
 side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "ftblibrary"
+type = "required"
+versionRange = "${ftb_library_version_range}"
+ordering = "AFTER"
+side = "BOTH"
 
 [[mixins]]
 config = "ftbobsidian.mixins.json"
