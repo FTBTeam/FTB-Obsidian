@@ -1,18 +1,16 @@
 package dev.ftb.mods.ftbobsidian;
 
-import dev.ftb.mods.ftblibrary.config.manager.ConfigManager;
+import dev.ftb.mods.ftblibrary.snbt.config.ConfigUtil;
 import dev.ftb.mods.ftbobsidian.config.StartupConfig;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.FolderRepositorySource;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.level.validation.DirectoryValidator;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 
 import net.neoforged.fml.loading.FMLPaths;
@@ -26,14 +24,13 @@ import java.nio.file.Path;
 public class Obsidian {
     public static final String MOD_ID = "ftbobsidian";
 
-    public static Path FTB_DIRECTORY = FMLPaths.GAMEDIR.get().resolve("obsidian");
     private static final Component OBSIDIAN_LOADED_DECORATOR = Component.literal("Obsidian").withStyle(ChatFormatting.DARK_PURPLE);
     private static final Path DATA_PACKS_PATH = FMLPaths.GAMEDIR.get().resolve("datapacks");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Obsidian.class);
 
-    public Obsidian(IEventBus eventBus, ModContainer container, Dist dist) {
-        ConfigManager.getInstance().registerStartupConfig(StartupConfig.CONFIG, MOD_ID);
+    public Obsidian(IEventBus eventBus) {
+        ConfigUtil.loadDefaulted(StartupConfig.CONFIG, FMLPaths.CONFIGDIR.get(), MOD_ID);
 
         eventBus.addListener(this::addPackFinders);
     }
@@ -46,7 +43,7 @@ public class Obsidian {
         }
     }
 
-    public static Identifier id(String path) {
-        return Identifier.fromNamespaceAndPath(Obsidian.MOD_ID, path);
+    public static ResourceLocation id(String path) {
+        return new ResourceLocation(Obsidian.MOD_ID, path);
     }
 }
