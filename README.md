@@ -10,6 +10,16 @@ Obsidian is currently a utility mod aimed at providing some essential features r
 - Ability to override a `resourcepacks` compatability via the `ftbobsidian-startup.snbt` config. This allows you to force Minecraft to think a `resourcepack` is compatible when the `resourcepack` itself does not define it as such.
 - Ability to load datapacks by default via the `datapacks` folder. This does not require a config, any datapacks inside this path are automatically loaded into the game.
 
+### Defaults
+
+Obsidian supports a concept of "defaults" which essentially is a directory that's contents will be copied into the games root on first startup of the pack.
+
+Any contents within the `obsidian/defaults/all` directory will be layered on top of the game root without overwriting any existing files. This process is done as soon as our mod can inject itself into the game. This means the files should be written in before anything has a chance to read them.
+
+**`options.txt`**
+
+The users `options.txt` file does not need special handling as the game will automatically accept existing entries whilst adding in any missing options. This means you can just put the default options you'd like for the user to have, then when the game loads, these options will be merged into the games default options.
+
 ## Support
 
 - For **Modpack** issues, please go here: https://go.ftb.team/support-modpack
