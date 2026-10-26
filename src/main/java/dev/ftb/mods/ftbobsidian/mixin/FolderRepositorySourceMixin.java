@@ -1,6 +1,5 @@
 package dev.ftb.mods.ftbobsidian.mixin;
 
-import dev.ftb.mods.ftbobsidian.client.ClientConfig;
 import dev.ftb.mods.ftbobsidian.config.StartupConfig;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.packs.PackLocationInfo;
@@ -15,8 +14,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-import java.util.List;
-
 @Mixin(FolderRepositorySource.class)
 public class FolderRepositorySourceMixin {
     @Shadow
@@ -26,23 +23,25 @@ public class FolderRepositorySourceMixin {
     @Unique
     private static final PackSelectionConfig FORCE_LOADED_CONFIG = new PackSelectionConfig(true, Pack.Position.TOP, false);
 
+    @Unique
+    private static final PackSelectionConfig FORCE_LOADED_CONFIG_TOP = new PackSelectionConfig(true, Pack.Position.TOP, true);
+
     @ModifyArg(
             method = "lambda$loadPacks$0",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/Pack;readMetaAndCreate(Lnet/minecraft/server/packs/PackLocationInfo;Lnet/minecraft/server/packs/repository/Pack$ResourcesSupplier;Lnet/minecraft/server/packs/PackType;Lnet/minecraft/server/packs/PackSelectionConfig;)Lnet/minecraft/server/packs/repository/Pack;"),
             index = 3
     )
     private PackSelectionConfig modifyPackSelectionConfig(PackSelectionConfig selectionConfig, @Local PackLocationInfo packLocationInfo) {
+        // We don't care about server data packs.
         if (this.packType == PackType.SERVER_DATA) {
             return selectionConfig;
         }
 
         String fileName = packLocationInfo.id();
-        List<String> forcedResourcePacks = StartupConfig.FORCE_LOADED_RESOURCE_PACKS.get();
-        if (forcedResourcePacks.isEmpty()) {
-            return selectionConfig;
-        }
-
-        if (forcedResourcePacks.contains(fileName)) {
+        var result = StartupConfig.isResourcePackForceLoaded(fileName);
+        if (result == StartupConfig.Result.FORCE_TOP) {
+            return FORCE_LOADED_CONFIG_TOP;
+        } else if (result == StartupConfig.Result.FORCE) {
             return FORCE_LOADED_CONFIG;
         }
 
