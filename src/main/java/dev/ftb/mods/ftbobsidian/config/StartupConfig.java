@@ -21,15 +21,11 @@ public interface StartupConfig {
             .comment("List of resource packs that are forced to be compatible with the current Minecraft version even if they would normally be marked as incompatible.");
 
     static Result isResourcePackForceLoaded(String packFileName) {
-        System.out.println("Checking if resource pack is force loaded: " + packFileName);
         if (FORCE_LOADED_TOP_RESOURCE_PACKS.get().contains(packFileName)) {
-            System.out.println("Resource pack is force loaded at the top: " + packFileName);
             return Result.FORCE_TOP;
         } else if (FORCE_LOADED_RESOURCE_PACKS.get().contains(packFileName)) {
-            System.out.println("Resource pack is force loaded: " + packFileName);
             return Result.FORCE;
         } else {
-            System.out.println("Resource pack is not force loaded: " + packFileName);
             return Result.IGNORE;
         }
     }
